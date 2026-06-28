@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Differential — Math from first principles</title>
+  <script>window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']]}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#0f172a;color:#e5e7eb;line-height:1.6}main{max-width:960px;margin:auto;padding:42px 18px 72px}.back{color:#9ca3af;text-decoration:none}h1{font-size:clamp(2.4rem,6vw,4.8rem);line-height:1;margin:32px 0 12px;letter-spacing:-.06em}.lead{font-size:1.15rem;color:#9ca3af;max-width:760px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:30px 0}.card,details,.playground{border:1px solid #374151;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border-radius:18px;padding:20px;margin:14px 0}.tag{color:#38bdf8;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;font-weight:800}.formula{background:#020617;border:1px solid #374151;border-radius:12px;padding:14px;margin:14px 0;overflow:auto;font-size:1.15rem}summary{cursor:pointer;font-weight:800}.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.pill{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);border-radius:999px;padding:10px 14px}.pill strong{color:#86efac}input{width:100%}canvas{width:100%;height:260px;background:#020617;border:1px solid #374151;border-radius:16px;margin-top:18px}.tiny{color:#9ca3af}
+  </style>
+</head>
+<body>
+<main>
+  <a class="back" href="../index.html">← Home</a>
+  <h1>Differentials</h1>
+  <p class="lead">A drill-down from the most basic idea: a differential is the tiny output movement caused by a tiny input movement.</p>
+  <section class="grid">
+    <div class="card"><div class="tag">Level 0</div><h2>Change</h2><p>Start with only this: something moves.</p><div class="formula">\(dx = \text{a tiny move in } x\)</div><div class="formula">\(dy = \text{the matching tiny move in } y\)</div></div>
+    <div class="card"><div class="tag">Level 1</div><h2>Connection</h2><p>A function connects input and output.</p><div class="formula">\(y=f(x)\)</div><p>If \(x\) moves, \(y\) usually moves.</p></div>
+    <div class="card"><div class="tag">Level 2</div><h2>Local multiplier</h2><p>The derivative is the multiplier at one exact point.</p><div class="formula">\(\frac{dy}{dx}=f'(x)\)</div></div>
+  </section>
+  <section class="card"><div class="tag">Core formula</div><h2>The whole idea in one line</h2><div class="formula">\(dy=f'(x)dx\)</div><p><strong>tiny output move = local multiplier × tiny input move</strong></p></section>
+  <details open><summary>What is \(dx\)?</summary><p>The chosen input nudge. Example: move \(x\) from 3 to 3.01, so \(dx=0.01\).</p></details>
+  <details open><summary>What is \(f'(x)\)?</summary><p>The slope right here, not globally. For \(y=x^2\), the slope is \(2x\). At \(x=3\), slope is 6.</p></details>
+  <details open><summary>What is \(dy\)?</summary><p>The predicted output nudge from the tangent line. At \(x=3\), \(dy=6dx\).</p></details>
+  <details open><summary>Why is this not exactly \(\Delta y\)?</summary><p>\(\Delta y\) is the true curve movement. \(dy\) is the straight-line approximation. For tiny moves, they are almost the same.</p></details>
+  <section class="playground">
+    <div class="tag">Interactive</div><h2>Example: \(y=x^2\)</h2><p>Move \(dx\). Compare the true change with the differential approximation.</p>
+    <label>x: <strong id="xLabel">3.00</strong></label><input id="x" type="range" min="-5" max="5" step="0.1" value="3" />
+    <label>dx: <strong id="dxLabel">0.10</strong></label><input id="dx" type="range" min="-1" max="1" step="0.01" value="0.10" />
+    <div class="readout"><div class="pill">Slope: <strong id="slope">6.00</strong></div><div class="pill">dy: <strong id="dy">0.60</strong></div><div class="pill">Δy: <strong id="delta">0.61</strong></div><div class="pill">Error: <strong id="error">0.01</strong></div></div>
+    <canvas id="chart" width="900" height="320"></canvas><p class="tiny">As \(dx\) gets smaller, the error shrinks.</p>
+  </section>
+</main>
+<script>
+const xInput=document.getElementById('x'),dxInput=document.getElementById('dx'),canvas=document.getElementById('chart'),ctx=canvas.getContext('2d');
+const ids=['xLabel','dxLabel','slope','dy','delta','error'];const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+const f=x=>x*x, mapX=x=>60+(x+6)/12*780, mapY=y=>280-(y+2)/32*240;
+function draw(x,dx){ctx.clearRect(0,0,900,320);ctx.strokeStyle='#374151';ctx.beginPath();ctx.moveTo(60,mapY(0));ctx.lineTo(840,mapY(0));ctx.stroke();ctx.beginPath();ctx.moveTo(mapX(0),30);ctx.lineTo(mapX(0),280);ctx.stroke();ctx.strokeStyle='#38bdf8';ctx.lineWidth=3;ctx.beginPath();for(let px=-6;px<=6;px+=.05){let cx=mapX(px),cy=mapY(f(px));px<-5.99?ctx.moveTo(cx,cy):ctx.lineTo(cx,cy)}ctx.stroke();let s=2*x;ctx.strokeStyle='#86efac';ctx.lineWidth=2;ctx.beginPath();for(let px=x-2;px<=x+2;px+=.05){let cy=mapY(f(x)+s*(px-x));px<=x-1.99?ctx.moveTo(mapX(px),cy):ctx.lineTo(mapX(px),cy)}ctx.stroke();[[x,f(x),'#fff'],[x+dx,f(x+dx),'#fbbf24'],[x+dx,f(x)+s*dx,'#86efac']].forEach(([px,py,c])=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(mapX(px),mapY(py),6,0,Math.PI*2);ctx.fill()})}
+function update(){let x=+xInput.value,dx=+dxInput.value,s=2*x,dy=s*dx,d=f(x+dx)-f(x);el.xLabel.textContent=x.toFixed(2);el.dxLabel.textContent=dx.toFixed(2);el.slope.textContent=s.toFixed(2);el.dy.textContent=dy.toFixed(4);el.delta.textContent=d.toFixed(4);el.error.textContent=Math.abs(d-dy).toFixed(4);draw(x,dx)}
+xInput.addEventListener('input',update);dxInput.addEventListener('input',update);update();
+</script>
+</body>
+</html>
